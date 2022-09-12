@@ -4,6 +4,8 @@ import { Router } from '@angular/router';
 
 import { AuthService } from './../../../core/services/auth.service';
 
+import { MyValidators } from './../../../utils/validators';
+
 @Component({
   selector: 'app-register',
   templateUrl: './register.component.html',
@@ -38,8 +40,33 @@ export class RegisterComponent implements OnInit {
   private buildForm() {
     this.form = this.formBuilder.group({
       email: ['', [Validators.required]],
-      password: ['', [Validators.required]],
+      password: ['', [Validators.required, Validators.minLength(6), MyValidators.validPassword]],
+      confirmPassword: ['', [Validators.required]],
+      type: ['company', [Validators.required]],
+      companyName: ['', [Validators.required]]
+    }, {
+      validators: MyValidators.matchPasswords
     });
+
+    this.typeField.valueChanges.subscribe( value => {
+      console.log(value);
+      if (value === 'company') {
+        this.companyField.setValidators([Validators.required]);
+      } else {
+        this.companyField.setValidators(null);
+      }
+
+      this.companyField.updateValueAndValidity();
+
+    });
+  }
+
+  get typeField() {
+    return this.form.get('type');
+  }
+
+  get companyField() {
+    return this.form.get('companyName');
   }
 
 }
